@@ -24,7 +24,7 @@ else
   echo "==> Downloading qbt-samba ($REF)"
   curl -fsSL "https://github.com/$REPO/archive/refs/heads/$REF.tar.gz" | tar xz -C "$TMP"
 fi
-SRC="$(ls -d "$TMP"/qbt-samba*/ | head -n1)"; SRC="${SRC%/}"
+SRC="$(find "$TMP" -mindepth 1 -maxdepth 1 -type d -name "qbt-samba*" | head -n1)"
 
 # install.sh is safe to re-run: it keeps /etc/qbt-samba (shares, passwords, config).
 bash "$SRC/install.sh"
