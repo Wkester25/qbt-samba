@@ -52,8 +52,10 @@ Already have a qBittorrent LXC? Skip this and run `install-all.sh` inside it
 - Add a share with its server, share name, username and password. **Test connection**
   mounts it briefly and checks it can write before you save.
 - Each share is mounted at `/mnt/samba/<name>`, and qBittorrent writes to it directly.
-- **Use for downloads** makes a share qBittorrent's default save folder.
-  **Add category** creates a category with the same name that saves to the share.
+- **Use for downloads** makes a share qBittorrent's default save folder, and turns off
+  "Keep incomplete torrents in" so unfinished downloads go to the share too.
+  **Add category** creates a category with the same name that saves to the share
+  (unfinished downloads included).
 - Mount, unmount, edit or remove shares from the same window.
 
 ## How it works
@@ -162,6 +164,18 @@ Then reload the WebUI and open **Tools > Samba Shares...**.
 the service can't tell who is logged in, so it refuses every request and the
 window says why.
 
+### Updating the add-on
+
+Run this on the Proxmox host (replace `105` with your container ID):
+
+```bash
+pct exec 105 -- bash -c "$(curl -fsSL https://raw.githubusercontent.com/Wkester25/qbt-samba/main/update.sh)"
+```
+
+Or, inside the container, run `bash /root/qbt-samba/update.sh`. Your shares, passwords and
+qBittorrent settings are kept. qBittorrent restarts during the update, so reload
+the WebUI page afterwards (Ctrl+Shift+R) and log in again.
+
 ### After a qBittorrent upgrade
 
 The window is built from the WebUI of the version you had at install time. After
@@ -205,7 +219,7 @@ To remove everything: `bash /root/qbt-samba/uninstall.sh`.
 | `qbt-stack-proxmox.sh` | Proxmox host script: creates the LXC and runs `install-all.sh` in it (built file, add-on bundled inside) |
 | `proxmox/ct-template.sh`, `proxmox/build.sh` | Source of the host script; run `bash proxmox/build.sh` after changing any add-on file |
 | `install-all.sh` | One-shot installer inside a container: qBittorrent-nox + Jackett/Prowlarr + this add-on |
-| `install.sh`, `install-webui.sh`, `uninstall.sh` | Add-on setup and removal |
+| `install.sh`, `install-webui.sh`, `update.sh`, `uninstall.sh` | Add-on setup, update and removal |
 | `systemd/` | Service files |
 | `tests/test_server.py` | Unit tests: `python3 -m unittest tests.test_server` |
 

@@ -140,24 +140,38 @@
             .catch(function (e) { banner(e.message); busy(button, false); });
     }
 
+    // qBittorrent 5.x's WebUI keeps a copy of the preferences it loaded at
+    // startup, and the Add torrent dialog fills in its save folder from that
+    // copy. Reload it, or new torrents keep going to the old folder.
+    function refreshWebUIPreferences() {
+        try {
+            var cache = window.parent.qBittorrent && window.parent.qBittorrent.Cache;
+            if (cache && cache.preferences && cache.preferences.init) return cache.preferences.init();
+        } catch (e) { /* older WebUI without the cache: nothing to refresh */ }
+    }
+
     function useAsDefault(button, s) {
         if (!s.mounted) { banner("Mount " + s.name + " first, so downloads don't fail."); return; }
         busy(button, true, "Saving...");
-        qbt("app/setPreferences", { json: JSON.stringify({ save_path: s.path }) })
-            .then(function () { banner("New downloads now save to " + s.path + " by default.", "info"); })
+        // Also turn off "Keep incomplete torrents in": otherwise unfinished
+        // downloads still go to the container's own disk and fill it up.
+        qbt("app/setPreferences", { json: JSON.stringify({ save_path: s.path, temp_path_enabled: false }) })
+            .then(refreshWebUIPreferences)
+            .then(function () { banner("New downloads now save to " + s.path + " by default, including while they download.", "info"); })
             .catch(function (e) { banner("Couldn't change the default save folder: " + e.message); })
             .then(function () { busy(button, false); });
     }
 
     function addCategory(button, s) {
         busy(button, true, "Adding...");
-        var params = { category: s.name, savePath: s.path };
+        // downloadPathEnabled=false: unfinished downloads in this category go
+        // straight to the share too, not to the "incomplete" folder on local disk.
+        var params = { category: s.name, savePath: s.path, downloadPathEnabled: "false" };
         fetch("api/v2/torrents/categories", { credentials: "same-origin" })
             .then(function (res) { return res.ok ? res.json() : {}; })
             .then(function (cats) {
                 var cur = cats[s.name];
                 if (!cur) return qbt("torrents/createCategory", params);
-                if ((cur.savePath || "").replace(/\/+$/, "") === s.path) return;
                 return qbt("torrents/editCategory", params);
             })
             .then(function () { banner("Category \"" + s.name + "\" now saves to " + s.path + ".", "info"); })
