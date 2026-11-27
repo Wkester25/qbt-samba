@@ -292,7 +292,7 @@ install_qbittorrent() {
   msg_ok "qBittorrent-nox $QBT_VERSION installed in $QBT_DIR"
 
   local conf; conf="$(qbt_conf)"
-  install -d -o "$QBT_SVC_USER" -g "$QBT_SVC_USER" -m 755 "$DOWNLOAD_DIR" "$DOWNLOAD_DIR/incomplete"
+  install -d -o "$QBT_SVC_USER" -g "$QBT_SVC_USER" -m 755 "$DOWNLOAD_DIR"
   if [ ! -f "$conf" ]; then
     install -d -o "$QBT_SVC_USER" -g "$QBT_SVC_USER" -m 700 "$(dirname "$conf")"
     local hash; hash="$(qbt_password_hash "$QBT_WEBUI_PASS")"
@@ -302,13 +302,11 @@ Accepted=true
 
 [BitTorrent]
 Session\DefaultSavePath=$DOWNLOAD_DIR
-Session\TempPath=$DOWNLOAD_DIR/incomplete
-Session\TempPathEnabled=true
+Session\TempPathEnabled=false
 
 [Preferences]
 Downloads\SavePath=$DOWNLOAD_DIR/
-Downloads\TempPath=$DOWNLOAD_DIR/incomplete/
-Downloads\TempPathEnabled=true
+Downloads\TempPathEnabled=false
 WebUI\Port=$QBT_WEBUI_PORT
 WebUI\Username=$QBT_WEBUI_USER
 WebUI\Password_PBKDF2="$hash"

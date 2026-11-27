@@ -52,8 +52,10 @@ Already have a qBittorrent LXC? Skip this and run `install-all.sh` inside it
 - Add a share with its server, share name, username and password. **Test connection**
   mounts it briefly and checks it can write before you save.
 - Each share is mounted at `/mnt/samba/<name>`, and qBittorrent writes to it directly.
-- **Use for downloads** makes a share qBittorrent's default save folder.
-  **Add category** creates a category with the same name that saves to the share.
+- **Use for downloads** makes a share qBittorrent's default save folder, and turns off
+  "Keep incomplete torrents in" so unfinished downloads go to the share too.
+  **Add category** creates a category with the same name that saves to the share
+  (unfinished downloads included).
 - Mount, unmount, edit or remove shares from the same window.
 
 ## How it works
