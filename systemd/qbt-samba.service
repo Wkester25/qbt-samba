@@ -1,0 +1,13 @@
+[Unit]
+Description=qBittorrent Samba share manager (API for the WebUI Samba tab)
+After=network-online.target qbt-samba-mount.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 /opt/qbt-samba/server.py --config /etc/qbt-samba/config.json --state-dir /etc/qbt-samba
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

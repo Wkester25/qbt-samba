@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Samba Shares</title>
+    <link rel="stylesheet" href="css/samba.css" />
+    <script src="scripts/samba.js" defer></script>
+</head>
+<body>
+    <div id="banner" class="banner" hidden></div>
+
+    <section>
+        <div class="section-head">
+            <h2>Shares</h2>
+            <button type="button" id="addBtn">Add share</button>
+        </div>
+        <p class="hint">Downloads saved to a share's folder go straight onto the network share.</p>
+        <table id="sharesTable">
+            <thead>
+                <tr><th>Name</th><th>Address</th><th>Status</th><th></th></tr>
+            </thead>
+            <tbody id="sharesBody">
+                <tr><td colspan="4" class="muted">Loading...</td></tr>
+            </tbody>
+        </table>
+    </section>
+
+    <section id="formSection" hidden>
+        <h2 id="formTitle">Add share</h2>
+        <form id="shareForm" autocomplete="off">
+            <label>Name
+                <input name="name" required maxlength="32" pattern="[A-Za-z0-9][A-Za-z0-9_\-]{0,31}" placeholder="media" />
+                <small>Letters, numbers, - and _. Becomes the folder /mnt/samba/&lt;name&gt;.</small>
+            </label>
+            <label>Server
+                <input name="server" required placeholder="192.168.1.10 or nas.local" />
+            </label>
+            <label>Share
+                <input name="share" required placeholder="Media or Media/Downloads" />
+                <small>The share name, optionally followed by a sub folder.</small>
+            </label>
+            <label>Username
+                <input name="username" required autocomplete="off" />
+            </label>
+            <label>Password
+                <input name="password" type="password" autocomplete="new-password" />
+                <small id="passwordHint">Required.</small>
+            </label>
+            <label>SMB version
+                <select name="version">
+                    <option value="">Automatic</option>
+                    <option value="3.1.1">3.1.1</option>
+                    <option value="3.0">3.0</option>
+                    <option value="2.1">2.1</option>
+                    <option value="2.0">2.0</option>
+                    <option value="1.0">1.0 (old devices only)</option>
+                </select>
+            </label>
+            <div id="formResult" class="result" hidden></div>
+            <div class="actions">
+                <button type="button" id="testBtn">Test connection</button>
+                <span class="spacer"></span>
+                <button type="button" id="cancelBtn" class="secondary">Cancel</button>
+                <button type="submit" id="saveBtn" class="primary">Save and mount</button>
+            </div>
+        </form>
+    </section>
+</body>
+</html>

@@ -1,0 +1,15 @@
+[Unit]
+Description=Mount qBittorrent Samba shares before qBittorrent starts
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/bin/python3 /opt/qbt-samba/server.py --mount-only --config /etc/qbt-samba/config.json --state-dir /etc/qbt-samba
+# Unmount cleanly on shutdown, after qBittorrent has stopped.
+ExecStop=/bin/sh -c 'for d in /mnt/samba/*; do mountpoint -q "$d" && umount "$d"; done; true'
+TimeoutStartSec=120
+
+[Install]
+WantedBy=multi-user.target
