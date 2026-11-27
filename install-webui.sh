@@ -110,9 +110,13 @@ cp "$HERE/webui/css/samba.css" "$STAGE/private/css/"
 cp "$HERE/webui/images/samba-share.svg" "$STAGE/private/images/"
 # The source files carry translation markers and placeholders that qBittorrent
 # only fills in for its built-in WebUI. Fill them in (English text).
-python3 - "$STAGE" "${VERSION:-src}" <<'PY'
+# The cache id changes on every build, so browsers fetch the new files after an update.
+python3 - "$STAGE" "${VERSION:-src}-$(date +%s)" <<'PY'
 import os, re, sys
 root, version = sys.argv[1:]
+# Letters, digits and _ only: the WebUI's script loader (monkeypatch.js) matches
+# "?v=\w+", and anything else breaks the Search tab and torrent detail tabs.
+cacheid = re.sub(r"\W", "_", "qbtsamba_" + version)
 tr = re.compile(r"QBT_TR\((.*?)\)QBT_TR\[CONTEXT=[^\]]*\]")
 for d, _, files in os.walk(root):
     for f in files:
@@ -120,7 +124,7 @@ for d, _, files in os.walk(root):
             p = os.path.join(d, f)
             s = open(p, encoding="utf-8").read()
             t = tr.sub(lambda m: m.group(1), s)
-            t = t.replace("${LANG}", "en").replace("${CACHEID}", "qbt-samba-" + version)
+            t = t.replace("${LANG}", "en").replace("${CACHEID}", cacheid)
             if t != s:
                 open(p, "w", encoding="utf-8").write(t)
 PY
